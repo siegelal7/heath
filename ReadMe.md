@@ -1,4 +1,4 @@
-# AllHues
+# Heath
 
 <!-- ![AllHues Homepage Image](./client/public/images/allhues-homepage.png) -->
 
