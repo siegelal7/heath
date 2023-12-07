@@ -24,6 +24,7 @@ const UserSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  bankAccounts:[{ type: Schema.Types.ObjectId, ref: "BankAccount" }]
 });
 
 const User = mongoose.model("User", UserSchema);

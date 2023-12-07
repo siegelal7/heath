@@ -13,6 +13,8 @@ app.use(express.json());
 
 // app.use("/api/contentCreators", require("./routes/api/contentCreators"));
 const Users = require("./controllers/UserController");
+const BankAccount = require("./controllers/BankController");
+const TransactionController = require("./controllers/TransactionController");
 
 mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/heath", {
 });
@@ -34,6 +36,8 @@ app.get("/api/config", (req, res) => {
 });
 // app.use(kitsItemsController);
 app.use(Users);
+app.use(BankAccount);
+app.use(TransactionController);
 // app.use(kitsController);
 
 app.use(express.static("client/build"));
