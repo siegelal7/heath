@@ -1,6 +1,6 @@
 # AllHues
 
-![AllHues Homepage Image](./client/public/images/allhues-homepage.png)
+<!-- ![AllHues Homepage Image](./client/public/images/allhues-homepage.png) -->
 
 ## Description
 
