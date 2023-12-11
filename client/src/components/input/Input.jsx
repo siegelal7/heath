@@ -1,6 +1,6 @@
 import React, { useState, useEffect }  from 'react';
 
-export default function Form({handleSubmit, inputBankVal, label, name, buttonLabel, setValue, value}) {
+export default function Input({handleSubmit,type, inputBankVal, label, name, buttonLabel}) {
   // const [inputValueFake, setInputValueFake] = useState("");
   // const [inputValueOwed, setInputValueOwed] = useState("");
   const [val, setVal] = useState('');
@@ -23,7 +23,7 @@ export default function Form({handleSubmit, inputBankVal, label, name, buttonLab
   return (
     <form onSubmit={(e)=>handleSubmit(e, val)}>
       <label>{label}
-        <input type='number' name={name} value={val} onChange={handleInputChange} />
+        <input type={type} name={name} value={val} onChange={handleInputChange} />
         {/* <input type='number' name='inputValueOwed' value={inputValueOwed} onChange={handleInputChange} /> */}
       </label>
       {/* <label>Money owed: 

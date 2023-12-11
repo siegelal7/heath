@@ -5,6 +5,7 @@ import Profile from './pages/Profile';
 import NoPage from './pages/NoPage';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import Logout from './pages/Logout';
 
 function App() {
   return (
@@ -15,6 +16,8 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/logout" element={<Logout />} />
+
 
           {/* <Route path="contact" element={<Contact />} /> */}
         <Route path="*" element={<NoPage />} />

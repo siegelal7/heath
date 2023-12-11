@@ -2,9 +2,9 @@ const router = require("express").Router();
 const db = require("../models");
 const auth = require("../middleware/auth");
 
-router.get("/api/bankaccounts", (req, res) => {
-  db.BankAccount.find({})
-    .limit(1)
+router.get("/api/bankaccounts/:id", (req, res) => {
+  const id = req.params.id;
+  db.BankAccount.findOne({user:id})
     .populate("transactions")
     .then((found) => {
       res.json(found);

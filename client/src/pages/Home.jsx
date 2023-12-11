@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Dashboard from "../components/dashboard/Dashboard";
 import "./Home.css";
-import Form from "../components/form/Form";
+import Input from "../components/input/Input";
 import axios from "axios";
 import Transactions from "../components/transactions/Transactions";
+import UserContext from "../contexts/UserContext";
+import { useLocation,Link } from "react-router-dom";
 
 export default function Home() {
   const [moneyShownInAccount, setMoneyShownInAccount] = useState(0);
@@ -12,30 +14,37 @@ export default function Home() {
   const [transactions, setTransactions] = useState([]);
   const [inputValueShown, setInputValueShown] = useState("");
   const [bankId, setBankId] = useState("");
+  const [userObj, setUserObj] = useState({
+    token: "",
+    user: { id: "", name: "", userName: "", email: "" },
+  });
+  let location = useLocation();
 
+  //fetch bank account and transactions
   useEffect(() => {
-    let runBool = false;
-    if (!runBool) {
-      runBool = true;
+    if (location?.state && location.state?.loginResponse) {
+      //fetch bank acount
       axios
-        .get("/api/bankaccounts")
+        .get(`/api/bankaccounts/${location.state.loginResponse.user.id}`)
         .then((response) => {
+          console.log("response from get bankaccounts");
           console.log(response);
-          setMoneyShownInAccount(response?.data[0]?.balance);
-          setBankAcctVal(response?.data[0]?.balance);
-          setBankId(response?.data[0]?._id);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      // }
-
-      // if (transactions.length === 0) {
-      axios
-        .get("/api/transactions")
-        .then((response) => {
-          console.log(response);
-          setTransactions(response?.data);
+          if (response.status === 200 || response.status === 304) {
+            setMoneyShownInAccount(response?.data?.balance);
+            setBankAcctVal(response?.data?.balance);
+            setBankId(response?.data?._id);
+            //fetch transactions for this bankaccount
+            axios
+              .get(`/api/transactions/${response?.data?._id}`)
+              .then((response) => {
+                console.log("response from get transactions");
+                console.log(response);
+                setTransactions(response?.data);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          }
         })
         .catch((error) => {
           console.log(error);
@@ -45,7 +54,7 @@ export default function Home() {
 
   useEffect(() => {
     let placeholder = moneyShownInAccount;
-    for (let i = 0; i < transactions.length; i++) {
+    for (let i = 0; i < transactions?.length; i++) {
       const iterElement = transactions[i];
       const valNumber = parseInt(placeholder) - parseInt(iterElement?.value);
       placeholder = valNumber;
@@ -53,66 +62,85 @@ export default function Home() {
     setMoneyAfterOwedSubtracted(placeholder);
   }, [transactions]);
 
-  const handleSubmit = (event, moneyShown) => {
+  useEffect(() => {
+    console.log("location.state");
+
+    if (location?.state && location.state?.loginResponse) {
+      console.log(location.state);
+      setUserObj(location.state.loginResponse);
+    }
+  }, [location]);
+
+  const handleSubmitBankAccount = (event, moneyShown) => {
     event.preventDefault();
-    console.log("hi");
-    setMoneyShownInAccount(moneyShown);
-    console.log(moneyShownInAccount);
-    // const finalVal = parseInt(moneyShown) - parseInt(moneyOwed);
-    // setMoneyAfterOwedSubtracted(finalVal);
-    axios
-      .post("/api/bankaccount/create", {
-        accountName: "testing123",
-        balance: moneyShown,
-      })
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((error) => {
-        console.log("error " + error);
-      });
+
+    if (userObj?.user?.id) {
+      setMoneyShownInAccount(moneyShown);
+
+      axios
+        .post("/api/bankaccount/create", {
+          accountName: "testing123",
+          balance: moneyShown,
+          user: userObj.user.id,
+        })
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.log("error " + error);
+        });
+    }
   };
 
   const handleTransactionSubmit = (event, transValue) => {
     event.preventDefault();
-    console.log("other");
-    axios
-      .post("/api/transaction/create", {
-        transactionName: "123yoraybe",
-        value: transValue,
-        fromBank: bankId,
-      })
-      .then((response) => {
-        console.log(response);
-        setTransactions([...transactions, response.data]);
-      })
-      .catch((error) => {
-        console.log("error " + error);
-      });
+    
+    if (bankId && userObj?.user && userObj.user?.id) {
+      axios
+        .post("/api/transaction/create", {
+          transactionName: "123yoraybe",
+          value: transValue,
+          fromBank: bankId,
+          fromUser: userObj.user.id,
+        })
+        .then((response) => {
+          console.log(response);
+          setTransactions([...transactions, response.data]);
+        })
+        .catch((error) => {
+          console.log("error " + error);
+        });
+    }
   };
 
   return (
-    <div className="container">
-      <Dashboard
-        moneyShownInAccount={moneyShownInAccount}
-        moneyAfterOwedSubtracted={moneyAfterOwedSubtracted}
-      ></Dashboard>
-      <Form
-        handleSubmit={handleSubmit}
-        label="Shown Bank Balance"
-        name="inputValueFake"
-        buttonLabel="Submit"
-        inputBankVal={bankAcctVal}
-        value={inputValueShown}
-        setValue={setInputValueShown}
-      ></Form>
-      <Form
-        handleSubmit={handleTransactionSubmit}
-        label="Submit a transaction"
-        name="transaction"
-        buttonLabel="Add transaction"
-      ></Form>
-      <Transactions iterList={transactions}></Transactions>
-    </div>
+    <UserContext.Provider value={userObj}>
+      <div className="container">
+        <Link to='/login'>Login</Link>
+        <Link to='/logout'>Logout</Link>
+        <Dashboard
+          moneyShownInAccount={moneyShownInAccount}
+          moneyAfterOwedSubtracted={moneyAfterOwedSubtracted}
+        ></Dashboard>
+        <Input
+          handleSubmit={handleSubmitBankAccount}
+          label="Shown Bank Balance"
+          name="inputValueFake"
+          type="number"
+          buttonLabel="Submit"
+          inputBankVal={bankAcctVal}
+          value={inputValueShown}
+          setValue={setInputValueShown}
+        ></Input>
+        <Input
+          handleSubmit={handleTransactionSubmit}
+          label="Submit a transaction"
+          type="number"
+          name="transaction"
+          buttonLabel="Add transaction"
+        ></Input>
+        <Transactions iterList={transactions}></Transactions>
+      </div>
+    </UserContext.Provider>
   );
 }
