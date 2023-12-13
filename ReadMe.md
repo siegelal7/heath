@@ -42,4 +42,4 @@ use ituseit
 
 Andrew Siegel: 
 siegelal@protonmail.com • 
-[Andrew's Github page](https://www.github.com/siegelal7) \
+[Andrew's Github page](https://www.github.com/siegelal7) 
