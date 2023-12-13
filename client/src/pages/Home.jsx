@@ -62,6 +62,7 @@ export default function Home() {
     setMoneyAfterOwedSubtracted(placeholder);
   }, [transactions]);
 
+  
   useEffect(() => {
     console.log("location.state");
 
