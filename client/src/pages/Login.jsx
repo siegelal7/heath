@@ -1,10 +1,13 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/UserContext";
 
 export default function Login() {
   const [userInfo, setUserInfo] = useState({ email: "", password: "" });
   const navigate = useNavigate();
+
+  const { setAuthUser, setIsLoggedIn} = useAuth();
 
   const handleLoginSubmit = (event) => {
     event.preventDefault();
@@ -15,7 +18,9 @@ export default function Login() {
         // console.log(response);
         if (response.status === 200) {
           console.log("this");
-          navigate("/", {state: { loginResponse: response.data}});
+          setAuthUser(response.data);
+          setIsLoggedIn(true);
+          navigate("/");
           // console.log(response.status);
         } else {
           console.log("that");

@@ -4,7 +4,8 @@ import "./Home.css";
 import Input from "../components/input/Input";
 import axios from "axios";
 import Transactions from "../components/transactions/Transactions";
-import UserContext from "../contexts/UserContext";
+// import UserContext from "../contexts/UserContext";
+import {useAuth} from '../contexts/UserContext';
 import { useLocation,Link } from "react-router-dom";
 
 export default function Home() {
@@ -20,12 +21,16 @@ export default function Home() {
   });
   let location = useLocation();
 
+  const {authUser, setAuthUser, isLoggedIn, setIsLoggedIn} = useAuth();
+
   //fetch bank account and transactions
   useEffect(() => {
-    if (location?.state && location.state?.loginResponse) {
+    console.log('checks');
+    console.log(authUser);
+    if (authUser?.user && authUser.user?.id) {
       //fetch bank acount
       axios
-        .get(`/api/bankaccounts/${location.state.loginResponse.user.id}`)
+        .get(`/api/bankaccounts/${authUser.user.id}`)
         .then((response) => {
           console.log("response from get bankaccounts");
           console.log(response);
@@ -61,16 +66,6 @@ export default function Home() {
     }
     setMoneyAfterOwedSubtracted(placeholder);
   }, [transactions]);
-
-  
-  useEffect(() => {
-    console.log("location.state");
-
-    if (location?.state && location.state?.loginResponse) {
-      console.log(location.state);
-      setUserObj(location.state.loginResponse);
-    }
-  }, [location]);
 
   const handleSubmitBankAccount = (event, moneyShown) => {
     event.preventDefault();
@@ -115,7 +110,7 @@ export default function Home() {
   };
 
   return (
-    <UserContext.Provider value={userObj}>
+    // <UserContext.Provider value={userObj}>
       <div className="container">
         <Link to='/login'>Login</Link>
         <Link to='/logout'>Logout</Link>
@@ -142,6 +137,6 @@ export default function Home() {
         ></Input>
         <Transactions iterList={transactions}></Transactions>
       </div>
-    </UserContext.Provider>
+    // </UserContext.Provider>
   );
 }
