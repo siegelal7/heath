@@ -5,7 +5,7 @@ const auth = require("../middleware/auth");
 router.get("/api/bankaccounts/:id", (req, res) => {
   const id = req.params.id;
   db.BankAccount.findOne({user:id})
-    .populate("transactions")
+    // .populate("transactions")
     .then((found) => {
       res.json(found);
     })

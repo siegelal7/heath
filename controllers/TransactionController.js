@@ -14,6 +14,18 @@ router.get("/api/transactions/:id", (req, res) => {
     });
 });
 
+router.get("/api/usertransaction/:id", (req, res) => {
+  const id = req.params.id;
+  db.Transaction.find({fromUser:id})
+    // .populate("transactions")
+    .then((found) => {
+      res.json(found);
+    })
+    .catch((err) => {
+      res.status(400).json(err);
+    });
+});
+
 router.post("/api/transaction/create", ({ body }, res) => {
   db.Transaction.create(body)
     .then((newTransaction) => {

@@ -10,7 +10,7 @@ const BankAccountSchema = new Schema({
     type: String,
     required: true,
   },
-  transactions: [{type: Schema.Types.ObjectId, ref: "Transaction" }],
+  // transactions: [{type: Schema.Types.ObjectId, ref: "Transaction" }],
   user: {type: Schema.Types.ObjectId, ref: "User"},
 //   owed:{
 

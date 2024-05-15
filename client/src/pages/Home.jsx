@@ -5,7 +5,7 @@ import Input from "../components/input/Input";
 import axios from "axios";
 import Transactions from "../components/transactions/Transactions";
 // import UserContext from "../contexts/UserContext";
-import {useAuth} from '../contexts/UserContext';
+import {useAuth, UserProvider} from '../contexts/UserContext';
 import { useLocation,Link } from "react-router-dom";
 
 export default function Home() {
@@ -15,10 +15,10 @@ export default function Home() {
   const [transactions, setTransactions] = useState([]);
   const [inputValueShown, setInputValueShown] = useState("");
   const [bankId, setBankId] = useState("");
-  const [userObj, setUserObj] = useState({
-    token: "",
-    user: { id: "", name: "", userName: "", email: "" },
-  });
+  // const [userObj, setUserObj] = useState({
+  //   token: "",
+  //   user: { id: "", name: "", userName: "", email: "" },
+  // });
   let location = useLocation();
 
   const {authUser, setAuthUser, isLoggedIn, setIsLoggedIn} = useAuth();
@@ -70,14 +70,14 @@ export default function Home() {
   const handleSubmitBankAccount = (event, moneyShown) => {
     event.preventDefault();
 
-    if (userObj?.user?.id) {
+    if (authUser?.user?.id) {
       setMoneyShownInAccount(moneyShown);
 
       axios
         .post("/api/bankaccount/create", {
           accountName: "testing123",
           balance: moneyShown,
-          user: userObj.user.id,
+          user: authUser.user.id,
         })
         .then((response) => {
           console.log(response);
@@ -91,13 +91,13 @@ export default function Home() {
   const handleTransactionSubmit = (event, transValue) => {
     event.preventDefault();
     
-    if (bankId && userObj?.user && userObj.user?.id) {
+    if (bankId && authUser?.user && authUser.user?.id) {
       axios
         .post("/api/transaction/create", {
           transactionName: "123yoraybe",
           value: transValue,
           fromBank: bankId,
-          fromUser: userObj.user.id,
+          fromUser: authUser.user.id,
         })
         .then((response) => {
           console.log(response);
@@ -110,7 +110,7 @@ export default function Home() {
   };
 
   return (
-    // <UserContext.Provider value={userObj}>
+    <UserProvider value={authUser}>
       <div className="container">
         <Link to='/login'>Login</Link>
         <Link to='/logout'>Logout</Link>
@@ -137,6 +137,6 @@ export default function Home() {
         ></Input>
         <Transactions iterList={transactions}></Transactions>
       </div>
-    // </UserContext.Provider>
+    </UserProvider>
   );
 }
